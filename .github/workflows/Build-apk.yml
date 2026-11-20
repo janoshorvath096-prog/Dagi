@@ -1,0 +1,42 @@
+name: 23 APK készítése
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Projekt letöltése
+        uses: actions/checkout@v4
+
+      - name: Java beállítása
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Android SDK beállítása
+        uses: android-actions/setup-android@v3
+
+      - name: Gradle beállítása
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: APK fordítása
+        run: |
+          if [ -d "23_android_native_project" ]; then
+            cd 23_android_native_project
+          fi
+          gradle assembleDebug
+
+      - name: APK mentése
+        uses: actions/upload-artifact@v4
+        with:
+          name: 23-APK
+          path: 23_android_native_project/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: warn
